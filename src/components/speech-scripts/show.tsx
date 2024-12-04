@@ -2,7 +2,9 @@
 
 import { Stack, Typography } from "@mui/material";
 import { useShow } from "@refinedev/core";
-import { DateField, MarkdownField, NumberField, Show } from "@refinedev/mui";
+import { MarkdownField, Show } from "@refinedev/mui";
+import { DAYJS_FORMAT } from "@utils/constants";
+import dayjs from "dayjs";
 
 export const SpeechScriptShow = () => {
   const { query } = useShow();
@@ -13,32 +15,22 @@ export const SpeechScriptShow = () => {
   return (
     <Show isLoading={isLoading}>
       <Stack gap={1}>
-        <Typography variant="body1" fontWeight="bold">
+        <Typography variant="body1">
           Status: {record?.status || "--"}
         </Typography>
-        <Typography variant="body1" fontWeight="bold">
-          Created At
+        <Typography variant="body1">
+          Created At: {dayjs(record?.created_at).format(DAYJS_FORMAT)}
         </Typography>
-        <DateField value={record?.created_at} />
-        <Typography variant="body1" fontWeight="bold">
-          Updated At
+        <Typography variant="body1">
+          Updated At: {dayjs(record?.updated_at).format(DAYJS_FORMAT)}
         </Typography>
-        <DateField value={record?.updated_at} />
-        <Typography variant="body1" fontWeight="bold">
-          Refno
+        <Typography variant="body1">Ref No: {record?.refno ?? ""}</Typography>
+        <Typography variant="body1">
+          Revision: {record?.revision ?? ""}
         </Typography>
-        <NumberField value={record?.refno ?? ""} />
-        <Typography variant="body1" fontWeight="bold">
-          Revision
-        </Typography>
-        <NumberField value={record?.revision ?? ""} />
-        <Typography variant="body1" fontWeight="bold">
-          Content
-        </Typography>
+        <Typography variant="body1">Content</Typography>
         <MarkdownField value={record?.content} />
-        <Typography variant="body1" fontWeight="bold">
-          Original
-        </Typography>
+        <Typography variant="body1">Original</Typography>
         <MarkdownField value={record?.original} />
       </Stack>
     </Show>
