@@ -1,5 +1,5 @@
 import { DevtoolsProvider } from "@providers/devtools";
-import { GitHubBanner, Refine } from "@refinedev/core";
+import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { notificationProvider, RefineSnackbarProvider } from "@refinedev/mui";
 import routerProvider from "@refinedev/nextjs-router";
@@ -32,7 +32,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Suspense>
-          <GitHubBanner />
           <RefineKbarProvider>
             <ColorModeContextProvider defaultMode={defaultMode}>
               <RefineSnackbarProvider>
@@ -44,23 +43,14 @@ export default function RootLayout({
                     notificationProvider={notificationProvider}
                     resources={[
                       {
-                        name: "blog_posts",
-                        list: "/blog-posts",
-                        create: "/blog-posts/create",
-                        edit: "/blog-posts/edit/:id",
-                        show: "/blog-posts/show/:id",
+                        name: "speech_script",
+                        list: "/speech-scripts",
+                        // create: "/speech-scripts/create",
+                        edit: "/speech-scripts/edit/:id",
+                        show: "/speech-scripts/show/:id",
                         meta: {
-                          canDelete: true,
-                        },
-                      },
-                      {
-                        name: "categories",
-                        list: "/categories",
-                        create: "/categories/create",
-                        edit: "/categories/edit/:id",
-                        show: "/categories/show/:id",
-                        meta: {
-                          canDelete: true,
+                          canDelete: false,
+                          afterEdit: "edit",
                         },
                       },
                     ]}
@@ -69,6 +59,7 @@ export default function RootLayout({
                       warnWhenUnsavedChanges: true,
                       useNewQueryKeys: true,
                       projectId: "96nZzz-mvO4ND-gXy40j",
+                      disableTelemetry: true,
                     }}
                   >
                     {children}
