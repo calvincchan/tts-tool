@@ -2,13 +2,7 @@
 
 import { ISpeechScript } from "@interfaces/type";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import {
-  DateField,
-  EditButton,
-  List,
-  ShowButton,
-  useDataGrid,
-} from "@refinedev/mui";
+import { DateField, EditButton, List, useDataGrid } from "@refinedev/mui";
 import { DAYJS_FORMAT } from "@utils/constants";
 import React from "react";
 
@@ -41,11 +35,6 @@ export const SpeechScriptList = () => {
         type: "number",
       },
       {
-        field: "content",
-        headerName: "Content",
-        minWidth: 400,
-      },
-      {
         field: "original",
         headerName: "Original",
         minWidth: 400,
@@ -65,7 +54,6 @@ export const SpeechScriptList = () => {
           return (
             <>
               <EditButton hideText recordItemId={row.id} />
-              <ShowButton hideText recordItemId={row.id} />
             </>
           );
         },
