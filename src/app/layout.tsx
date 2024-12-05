@@ -43,7 +43,7 @@ export default function RootLayout({
                     notificationProvider={notificationProvider}
                     resources={[
                       {
-                        name: "speech_script",
+                        name: "speech_scripts",
                         list: "/speech-scripts",
                         // create: "/speech-scripts/create",
                         edit: "/speech-scripts/edit/:id",
