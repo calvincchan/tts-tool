@@ -30,13 +30,15 @@
     "@refinedev/react-hook-form": "^4.8.14",
     "@refinedev/supabase": "^5.7.4",
     "@supabase/ssr": "^0.3.0",
+    "@wavesurfer/react": "^1.0.7",
     "js-cookie": "^3.0.5",
     "markdown-to-jsx": "^7.7.1",
     "next": "^14.1.0",
     "prismjs": "^1.29.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-simple-code-editor": "^0.14.1"
+    "react-simple-code-editor": "^0.14.1",
+    "wavesurfer.js": "^7.8.10"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

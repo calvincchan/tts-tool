@@ -8,7 +8,7 @@ function generateHash(text: string): string {
 }
 
 interface RequestParams {
-  id: string;
+  ssml: string;
 }
 
 export default async function handler(
@@ -16,13 +16,15 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   if (req.method === "POST") {
-    // Get the "id" from the request body
+    // Get the "ssml" from the request body
     const params = req.body as RequestParams;
-    console.log("🚀 ~ params", params);
-    const recordId = params.id;
-    if (!recordId) {
-      return res.status(400).json({ error: "recordId parameter is required" });
+    const ssml = params.ssml;
+    if (!ssml) {
+      return res.status(400).json({ error: "Missing parameter 'ssml'" });
     }
+
+    // generate a hash from the SSML
+    const hash = generateHash(ssml);
 
     // Initialize the TextToSpeechClient and Supabase client
     const supabase = createClient(
@@ -40,33 +42,18 @@ export default async function handler(
       },
     });
 
-    // fetch the record from the database
-    let ssml: string = "", hash: string = "";
-    {
-      const { data: record, error } = await supabase
-        .from("speech_scripts")
-        .select("content")
-        .eq("id", recordId)
-        .single();
-      if (error) {
-        return res.status(500).json({
-          error: "Record not found",
-          message: error.message,
-        });
-      }
-      console.log("🚀 ~ record", record);
-      ssml = record.content;
-      hash = generateHash(ssml);
-    }
-
     // Check if the hash exists in the storage
-    const filename = `${recordId}-${hash}.mp3`;
+    const filename = `${hash}.mp3`;
     let url: string = "";
     {
-      const { data: storageFile } = await supabase.storage
+      const { data: storageFileExists } = await supabase.storage
         .from("tts")
-        .getPublicUrl(filename);
-      if (storageFile?.publicUrl) {
+        .exists(filename);
+      console.log("🚀 ~ storageFileExists:", storageFileExists);
+      if (storageFileExists) {
+        const { data: storageFile } = await supabase.storage
+          .from("tts")
+          .getPublicUrl(filename);
         url = storageFile.publicUrl;
       } else {
         // If the file does not exist, generate the TTS
@@ -96,12 +83,17 @@ export default async function handler(
             Details: JSON.stringify(uploadError),
           });
         }
-        url = uploadData.fullPath;
+
+        // Get the public URL of the uploaded file
+        const { data: storageFile } = await supabase.storage
+          .from("tts")
+          .getPublicUrl(filename);
+        url = storageFile.publicUrl;
       }
     }
 
     /* Return the URL of the audio file */
-    res.status(200).json({ url });
+    res.status(200).json({ url, hash });
   } else {
     res.setHeader("Allow", ["POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
