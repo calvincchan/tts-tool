@@ -6,7 +6,6 @@ import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
-  CircularProgress,
   MenuItem,
   Paper,
   TextField,
@@ -37,7 +36,12 @@ export const SpeechScriptEdit = () => {
     getValues,
     register,
     control,
-  } = useForm<ISpeechScript, HttpError, ISpeechScript>();
+  } = useForm<ISpeechScript, HttpError, ISpeechScript>({
+    defaultValues: {
+      content: "",
+      status: "Draft",
+    },
+  });
 
   const record = query?.data?.data;
 
@@ -95,136 +99,128 @@ export const SpeechScriptEdit = () => {
     <Edit
       saveButtonProps={{ ...saveButtonProps, startIcon: <Check /> }}
       footerButtonProps={{ sx: { p: 2, justifyContent: "flex-start" } }}
+      isLoading={formLoading}
     >
-      {formLoading ? (
-        <CircularProgress />
-      ) : (
-        <>
-          <Box
-            component="form"
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-            autoComplete="off"
-          >
-            <Typography variant="body1">
-              Status: {getValues("status") || "--"}
-            </Typography>
-            <Typography variant="body1">
-              Page: {record?.refno || "--"}
-            </Typography>
-            <Typography variant="body1">
-              Revision: {record?.revision || "--"}
-            </Typography>
-            <Box>
-              <Controller
-                control={control}
-                name="status"
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    sx={{ width: 200 }}
-                    margin="normal"
-                    InputLabelProps={{ shrink: true }}
-                    type="text"
-                    label="Status"
-                    select
-                  >
-                    {SpeechScriptStatus.map((name) => (
-                      <MenuItem key={name} value={name}>
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </Box>
-            <Paper
-              variant="outlined"
-              sx={{ borderColor: "primary.main", borderWidth: 2 }}
-            >
-              <Editor
-                autoFocus
-                value={content}
-                onValueChange={(value) => {
-                  setAudioUrl(null);
-                  setContent(value);
-                  setValue("content", value);
-                  // setValue("updated_at", new Date().toISOString());
-                }}
-                highlight={(code) =>
-                  Prism.highlight(code, Prism.languages.ssml, "ssml")
-                }
-                padding={10}
-                placeholder="Type some SSML here..."
-              />
-              {!!errors.content && (
-                <Typography variant="body2" color="error">
-                  {errors.content.message as string}
-                </Typography>
+      <>
+        <Box
+          component="form"
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          autoComplete="off"
+        >
+          <Typography variant="body1">Page: {record?.refno || "--"}</Typography>
+          <Typography variant="body1">
+            Revision: {record?.revision || "--"}
+          </Typography>
+          <Box>
+            <Controller
+              control={control}
+              name="status"
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  sx={{ width: 200 }}
+                  margin="normal"
+                  InputLabelProps={{ shrink: true }}
+                  type="text"
+                  label="Status"
+                  select
+                >
+                  {SpeechScriptStatus.map((name) => (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
-            </Paper>
-            <Box>
-              <LoadingButton
-                variant="contained"
-                color="primary"
-                onClick={() => handleTTS()}
-                loading={loading}
-              >
-                Generate Audio
-              </LoadingButton>
-            </Box>
-            {audioUrl && (
-              <Box>
-                <WavesurferPlayer
-                  height={100}
-                  width="100%"
-                  waveColor="lightgray"
-                  url={audioUrl}
-                  onReady={(wavesurfer) => {
-                    setWavesurfer(wavesurfer);
-                    setIsPlaying(false);
-                  }}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                />
-                <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      wavesurfer?.playPause();
-                    }}
-                    startIcon={isPlaying ? <Pause /> : <PlayArrow />}
-                  >
-                    {isPlaying ? "Pause" : "Play"}
-                  </Button>
-                  <a
-                    href={audioUrl || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outlined" startIcon={<Download />}>
-                      Download
-                    </Button>
-                  </a>
-                </Box>
-              </Box>
-            )}
-            <Paper sx={{ p: 2 }} variant="outlined">
-              <Typography variant="body2">Original Script</Typography>
-              <Markdown style={{ color: "text.secondary" }}>
-                {record?.original || "--"}
-              </Markdown>
-            </Paper>
-            <Box>
-              <Typography variant="body2">
-                Updated At: {dayjs(record?.updated_at).format(DAYJS_FORMAT)}
-              </Typography>
-              <Typography variant="body2">
-                Created At: {dayjs(record?.created_at).format(DAYJS_FORMAT)}
-              </Typography>
-            </Box>
+            />
           </Box>
-        </>
-      )}
+          <Paper
+            variant="outlined"
+            sx={{ borderColor: "primary.main", borderWidth: 2 }}
+          >
+            <Editor
+              autoFocus
+              value={content}
+              onValueChange={(value) => {
+                setAudioUrl(null);
+                setContent(value);
+                setValue("content", value);
+                // setValue("updated_at", new Date().toISOString());
+              }}
+              highlight={(code) =>
+                Prism.highlight(code, Prism.languages.ssml, "ssml")
+              }
+              padding={10}
+              placeholder="Type some SSML here..."
+            />
+            {!!errors.content && (
+              <Typography variant="body2" color="error">
+                {errors.content.message as string}
+              </Typography>
+            )}
+          </Paper>
+          <Box>
+            <LoadingButton
+              variant="contained"
+              color="primary"
+              onClick={() => handleTTS()}
+              loading={loading}
+            >
+              Generate Audio
+            </LoadingButton>
+          </Box>
+          {audioUrl && (
+            <Box>
+              <WavesurferPlayer
+                height={100}
+                width="100%"
+                waveColor="lightgray"
+                url={audioUrl}
+                onReady={(wavesurfer) => {
+                  setWavesurfer(wavesurfer);
+                  setIsPlaying(false);
+                }}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
+              <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    wavesurfer?.playPause();
+                  }}
+                  startIcon={isPlaying ? <Pause /> : <PlayArrow />}
+                >
+                  {isPlaying ? "Pause" : "Play"}
+                </Button>
+                <a
+                  href={audioUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outlined" startIcon={<Download />}>
+                    Download
+                  </Button>
+                </a>
+              </Box>
+            </Box>
+          )}
+          <Paper sx={{ p: 2 }} variant="outlined">
+            <Typography variant="body2">Original Script</Typography>
+            <Markdown style={{ color: "text.secondary" }}>
+              {record?.original || "--"}
+            </Markdown>
+          </Paper>
+          <Box>
+            <Typography variant="body2">
+              Updated At: {dayjs(record?.updated_at).format(DAYJS_FORMAT)}
+            </Typography>
+            <Typography variant="body2">
+              Created At: {dayjs(record?.created_at).format(DAYJS_FORMAT)}
+            </Typography>
+          </Box>
+        </Box>
+      </>
     </Edit>
   );
 };
