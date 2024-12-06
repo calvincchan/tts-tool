@@ -107,10 +107,14 @@ export const SpeechScriptEdit = () => {
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           autoComplete="off"
         >
-          <Typography variant="body1">Page: {record?.refno || "--"}</Typography>
-          <Typography variant="body1">
-            Revision: {record?.revision || "--"}
-          </Typography>
+          <Box>
+            <Typography variant="body1">
+              Page: {record?.refno || "--"}
+            </Typography>
+            <Typography variant="body1">
+              Revision: {record?.revision || "--"}
+            </Typography>
+          </Box>
           <Box>
             <Controller
               control={control}
