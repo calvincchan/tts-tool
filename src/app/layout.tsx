@@ -50,7 +50,6 @@ export default function RootLayout({
                         show: "/speech-scripts/show/:id",
                         meta: {
                           canDelete: false,
-                          afterEdit: "edit",
                         },
                       },
                     ]}
@@ -60,6 +59,9 @@ export default function RootLayout({
                       useNewQueryKeys: true,
                       projectId: "96nZzz-mvO4ND-gXy40j",
                       disableTelemetry: true,
+                      redirect: {
+                        afterEdit: "edit",
+                      },
                     }}
                   >
                     {children}
