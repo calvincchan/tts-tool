@@ -1,15 +1,18 @@
 "use client";
 
-import { ISpeechScript } from "@interfaces/type";
-import { Check, Pause, PlayArrow } from "@mui/icons-material";
+import { ISpeechScript, SpeechScriptStatus } from "@interfaces/type";
+import { Check, Download, Pause, PlayArrow } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
   CircularProgress,
+  MenuItem,
   Paper,
+  TextField,
   Typography,
 } from "@mui/material";
+import { HttpError } from "@refinedev/core";
 import { Edit } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
 import { DAYJS_FORMAT } from "@utils/constants";
@@ -21,6 +24,7 @@ import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css"; //Example style, you can use another
 import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
 import Editor from "react-simple-code-editor";
 import WaveSurfer from "wavesurfer.js";
 
@@ -28,15 +32,12 @@ export const SpeechScriptEdit = () => {
   const {
     saveButtonProps,
     refineCore: { query, formLoading },
-    formState: { errors },
+    formState: { errors, isDirty, dirtyFields },
     setValue,
-  } = useForm<ISpeechScript>({
-    refineCoreProps: {
-      autoSave: {
-        enabled: true,
-      },
-    },
-  });
+    getValues,
+    register,
+    control,
+  } = useForm<ISpeechScript, HttpError, ISpeechScript>();
 
   const record = query?.data?.data;
 
@@ -47,6 +48,13 @@ export const SpeechScriptEdit = () => {
       setContent(record.content);
     }
   }, [record]);
+
+  useEffect(() => {
+    if (!register) return;
+    register("content");
+    register("updated_at");
+    register("status");
+  }, [register]);
 
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -98,7 +106,7 @@ export const SpeechScriptEdit = () => {
             autoComplete="off"
           >
             <Typography variant="body1">
-              Status: {record?.status || "--"}
+              Status: {getValues("status") || "--"}
             </Typography>
             <Typography variant="body1">
               Page: {record?.refno || "--"}
@@ -106,15 +114,41 @@ export const SpeechScriptEdit = () => {
             <Typography variant="body1">
               Revision: {record?.revision || "--"}
             </Typography>
+            <Box>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    sx={{ width: 200 }}
+                    margin="normal"
+                    InputLabelProps={{ shrink: true }}
+                    type="text"
+                    label="Status"
+                    select
+                  >
+                    {SpeechScriptStatus.map((name) => (
+                      <MenuItem key={name} value={name}>
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+            </Box>
             <Paper
               variant="outlined"
               sx={{ borderColor: "primary.main", borderWidth: 2 }}
             >
               <Editor
+                autoFocus
                 value={content}
                 onValueChange={(value) => {
+                  setAudioUrl(null);
                   setContent(value);
                   setValue("content", value);
+                  // setValue("updated_at", new Date().toISOString());
                 }}
                 highlight={(code) =>
                   Prism.highlight(code, Prism.languages.ssml, "ssml")
@@ -152,16 +186,26 @@ export const SpeechScriptEdit = () => {
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                 />
-                <Button
-                  variant="contained"
-                  sx={{ mt: 2 }}
-                  onClick={() => {
-                    wavesurfer?.playPause();
-                  }}
-                  startIcon={isPlaying ? <Pause /> : <PlayArrow />}
-                >
-                  {isPlaying ? "Pause" : "Play"}
-                </Button>
+                <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      wavesurfer?.playPause();
+                    }}
+                    startIcon={isPlaying ? <Pause /> : <PlayArrow />}
+                  >
+                    {isPlaying ? "Pause" : "Play"}
+                  </Button>
+                  <a
+                    href={audioUrl || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outlined" startIcon={<Download />}>
+                      Download
+                    </Button>
+                  </a>
+                </Box>
               </Box>
             )}
             <Paper sx={{ p: 2 }} variant="outlined">
