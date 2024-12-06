@@ -49,7 +49,6 @@ export default async function handler(
       const { data: storageFileExists } = await supabase.storage
         .from("tts")
         .exists(filename);
-      console.log("🚀 ~ storageFileExists:", storageFileExists);
       if (storageFileExists) {
         const { data: storageFile } = await supabase.storage
           .from("tts")
