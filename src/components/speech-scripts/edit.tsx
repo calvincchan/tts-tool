@@ -39,12 +39,17 @@ export const SpeechScriptEdit = () => {
     getValues,
     register,
     control,
-    reset,
+    resetField,
     watch,
   } = useForm<ISpeechScript, HttpError, ISpeechScript>({
     defaultValues: {
       content: "",
       status: "Draft",
+    },
+    refineCoreProps: {
+      onMutationSuccess: () => {
+        resetField("content");
+      },
     },
   });
 
@@ -199,7 +204,6 @@ export const SpeechScriptEdit = () => {
           </LoadingButton>
           <Button
             {...saveButtonProps}
-            startIcon={<Check />}
             variant={dirtyFields.content ? "contained" : "outlined"}
           >
             Save
