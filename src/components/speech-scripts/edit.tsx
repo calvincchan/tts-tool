@@ -6,6 +6,7 @@ import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
+  Chip,
   MenuItem,
   Paper,
   Snackbar,
@@ -23,7 +24,7 @@ import Prism from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css"; //Example style, you can use another
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import Editor from "react-simple-code-editor";
 import WaveSurfer from "wavesurfer.js";
@@ -34,34 +35,18 @@ export const SpeechScriptEdit = () => {
   const {
     saveButtonProps,
     refineCore: { query, formLoading },
-    formState: { errors, dirtyFields, isDirty: _isDirty },
+    formState: { errors, dirtyFields },
     getValues,
     register,
     control,
+    reset,
+    watch,
   } = useForm<ISpeechScript, HttpError, ISpeechScript>({
     defaultValues: {
       content: "",
       status: "Draft",
     },
   });
-
-  const isDirty = useMemo(() => !!dirtyFields.content, [dirtyFields]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isDirty) {
-        event.preventDefault();
-        event.returnValue =
-          "You have unsaved changes. Are you sure you want to leave?";
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isDirty]);
 
   const record = query?.data?.data;
 
@@ -108,6 +93,9 @@ export const SpeechScriptEdit = () => {
 
   const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const refno = watch("refno");
+  const revision = watch("revision");
+  const updated_at = watch("updated_at");
 
   return (
     <Edit
@@ -121,10 +109,8 @@ export const SpeechScriptEdit = () => {
         autoComplete="off"
       >
         <Box>
-          <Typography variant="body1">Page: {getValues("refno")}</Typography>
-          <Typography variant="body1">
-            Revision: {getValues("revision")}
-          </Typography>
+          <Typography variant="body1">Page: {refno}</Typography>
+          <Typography variant="body1">Revision: {revision}</Typography>
         </Box>
         <Box>
           <Controller
@@ -150,18 +136,13 @@ export const SpeechScriptEdit = () => {
           />
         </Box>
 
-        <Paper
-          variant="outlined"
-          sx={{
-            borderColor: dirtyFields.content ? "salmon" : "primary.main",
-            borderWidth: 2,
-          }}
-        >
+        <Box>
           <Controller
             name="content"
             control={control}
-            render={({ field: { value, onChange } }) => (
+            render={({ field: { value, onChange, name } }) => (
               <Editor
+                name={name}
                 value={value}
                 onValueChange={(value) => {
                   setAudioUrl(null);
@@ -171,15 +152,22 @@ export const SpeechScriptEdit = () => {
                   Prism.highlight(code, Prism.languages.ssml, "ssml")
                 }
                 padding={10}
+                style={{
+                  borderRadius: 5,
+                  border: "1px solid gray",
+                }}
                 placeholder="Type some SSML here..."
               />
             )}
           />
+          {dirtyFields.content && (
+            <Chip label="unsaved" color="error" size="small" sx={{ my: 1 }} />
+          )}
           <Typography variant="body2" color="error">
             {errors.content?.message as string}
           </Typography>
-        </Paper>
-        <Box display="flex" gap={1}>
+        </Box>
+        <Box display="flex" alignItems="center" gap={1}>
           <LoadingButton
             variant="contained"
             color="primary"
@@ -194,7 +182,18 @@ export const SpeechScriptEdit = () => {
             variant={dirtyFields.content ? "contained" : "outlined"}
           >
             Save
-          </Button>{" "}
+          </Button>
+          <Typography variant="body2">
+            {`Example: <break strength="weak" /> <break strength="weak" />`}
+          </Typography>
+          <Typography variant="body2">
+            <a
+              href="https://github.com/fabiancelik/rich-voice-editor/wiki/SSML-Tags-and-Functions"
+              target="ssml"
+            >
+              SSML Reference
+            </a>
+          </Typography>
         </Box>
         {audioUrl && (
           <Box>
@@ -240,10 +239,7 @@ export const SpeechScriptEdit = () => {
         </Paper>
         <Box>
           <Typography variant="body2">
-            Updated At: {dayjs(record?.updated_at).format(DAYJS_FORMAT)}
-          </Typography>
-          <Typography variant="body2">
-            Created At: {dayjs(record?.created_at).format(DAYJS_FORMAT)}
+            Updated At: {dayjs(updated_at).format(DAYJS_FORMAT)}
           </Typography>
         </Box>
       </Box>

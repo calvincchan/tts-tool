@@ -1,4 +1,9 @@
-export const SpeechScriptStatus = ["Draft", "In Progress", "Approved"] as const;
+export const SpeechScriptStatus = [
+  "Draft",
+  "In Progress",
+  "Completed",
+  "Approved",
+] as const;
 
 export type SpeechScriptStatus = (typeof SpeechScriptStatus)[number];
 
