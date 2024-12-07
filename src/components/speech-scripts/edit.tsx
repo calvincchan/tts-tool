@@ -149,12 +149,14 @@ export const SpeechScriptEdit = () => {
 
         <Box>
           <Box mb={1} display="flex" gap={1} alignItems="center">
-            {["weak", "strong", "x-strong"].map((tag) => (
+            {["weak", "strong", "x-strong", "1s"].map((tag) => (
               <Button
                 key={tag}
                 variant="outlined"
                 onClick={() => {
-                  navigator.clipboard.writeText(`<break strength="${tag}"/>`);
+                  navigator.clipboard.writeText(
+                    `<break ${tag === "1s" ? "time" : "strength"}="${tag}"/>`
+                  );
                 }}
                 startIcon={<ContentCopy />}
               >
@@ -178,7 +180,6 @@ export const SpeechScriptEdit = () => {
                 name={name}
                 value={value}
                 onValueChange={(value) => {
-                  setAudioUrl(null);
                   onChange(value);
                 }}
                 highlight={(code) =>
