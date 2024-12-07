@@ -45,10 +45,7 @@ export const SpeechScriptEdit = () => {
     },
   });
 
-  const isDirty = useMemo(
-    () => Object.keys(dirtyFields).length > 0,
-    [dirtyFields]
-  );
+  const isDirty = useMemo(() => !!dirtyFields.content, [dirtyFields]);
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
