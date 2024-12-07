@@ -59,9 +59,9 @@ export default function RootLayout({
                       useNewQueryKeys: true,
                       projectId: "96nZzz-mvO4ND-gXy40j",
                       disableTelemetry: true,
-                      // redirect: {
-                      //   afterEdit: "edit",
-                      // },
+                      redirect: {
+                        afterEdit: "edit",
+                      },
                     }}
                   >
                     {children}
