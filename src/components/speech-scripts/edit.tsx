@@ -1,7 +1,13 @@
 "use client";
 
 import { ISpeechScript, SpeechScriptStatus } from "@interfaces/type";
-import { Check, Download, Pause, PlayArrow } from "@mui/icons-material";
+import {
+  Check,
+  ContentCopy,
+  Download,
+  Pause,
+  PlayArrow,
+} from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
   Box,
@@ -150,8 +156,9 @@ export const SpeechScriptEdit = () => {
                 onClick={() => {
                   navigator.clipboard.writeText(`<break strength="${tag}"/>`);
                 }}
+                startIcon={<ContentCopy />}
               >
-                Copy {tag} Break
+                {tag} Break
               </Button>
             ))}
             <Typography variant="body2">
