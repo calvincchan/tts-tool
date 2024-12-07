@@ -42,6 +42,7 @@ export const SpeechScriptList = () => {
       {
         field: "updated_at",
         headerName: "Updated At",
+        minWidth: 200,
         renderCell: function render({ value }) {
           return <DateField value={value} format={DAYJS_FORMAT} />;
         },
