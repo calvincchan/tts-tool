@@ -137,6 +137,27 @@ export const SpeechScriptEdit = () => {
         </Box>
 
         <Box>
+          <Box mb={1} display="flex" gap={1} alignItems="center">
+            {["weak", "strong", "x-strong"].map((tag) => (
+              <Button
+                key={tag}
+                variant="outlined"
+                onClick={() => {
+                  navigator.clipboard.writeText(`<break strength="${tag}"/>`);
+                }}
+              >
+                Copy {tag} Break
+              </Button>
+            ))}
+            <Typography variant="body2">
+              <a
+                href="https://github.com/fabiancelik/rich-voice-editor/wiki/SSML-Tags-and-Functions"
+                target="ssml"
+              >
+                SSML Reference
+              </a>
+            </Typography>
+          </Box>
           <Controller
             name="content"
             control={control}
@@ -167,7 +188,7 @@ export const SpeechScriptEdit = () => {
             {errors.content?.message as string}
           </Typography>
         </Box>
-        <Box display="flex" alignItems="center" gap={1}>
+        <Box display="flex" gap={1}>
           <LoadingButton
             variant="contained"
             color="primary"
@@ -183,17 +204,6 @@ export const SpeechScriptEdit = () => {
           >
             Save
           </Button>
-          <Typography variant="body2">
-            {`Example: <break strength="weak" /> <break strength="weak" />`}
-          </Typography>
-          <Typography variant="body2">
-            <a
-              href="https://github.com/fabiancelik/rich-voice-editor/wiki/SSML-Tags-and-Functions"
-              target="ssml"
-            >
-              SSML Reference
-            </a>
-          </Typography>
         </Box>
         {audioUrl && (
           <Box>
