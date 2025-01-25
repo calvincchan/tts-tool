@@ -8,6 +8,7 @@ import { cookies } from "next/headers";
 import React, { Suspense } from "react";
 
 import { ColorModeContextProvider } from "@contexts/color-mode";
+import { Chat } from "@mui/icons-material";
 import { authProviderClient } from "@providers/auth-provider";
 import { dataProvider } from "@providers/data-provider";
 
@@ -61,6 +62,10 @@ export default function RootLayout({
                       disableTelemetry: true,
                       redirect: {
                         afterEdit: "edit",
+                      },
+                      title: {
+                        text: "Text To Speech Studio",
+                        icon: <Chat />,
                       },
                     }}
                   >
