@@ -140,4 +140,38 @@ export const authProviderClient: AuthProvider = {
 
     return { error };
   },
+  forgotPassword: async ({ email }) => {
+    const { error } = await supabaseBrowserClient.auth.resetPasswordForEmail(
+      email
+    );
+
+    if (error) {
+      return {
+        success: false,
+        error,
+      };
+    }
+
+    return {
+      success: true,
+      redirectTo: "/login",
+    };
+  },
+  updatePassword: async ({ password }) => {
+    const { error } = await supabaseBrowserClient.auth.updateUser({
+      password,
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error,
+      };
+    }
+
+    return {
+      success: true,
+      redirectTo: "/login",
+    };
+  },
 };
