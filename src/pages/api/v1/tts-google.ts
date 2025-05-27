@@ -60,7 +60,7 @@ export default async function handler(
           input: { ssml },
           voice: {
             languageCode: "ja-JP",
-            name: "ja-JP-Wavenet-D",
+            name: "ja-JP-Chirp3-HD-Schedar",
           },
           audioConfig: { audioEncoding: "MP3", pitch: -1 },
         });
