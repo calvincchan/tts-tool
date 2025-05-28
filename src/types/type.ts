@@ -1,3 +1,5 @@
+import { Database } from "./database.types";
+
 export const SpeechScriptStatus = [
   "Draft",
   "In Progress",
@@ -7,13 +9,4 @@ export const SpeechScriptStatus = [
 
 export type SpeechScriptStatus = (typeof SpeechScriptStatus)[number];
 
-export interface ISpeechScript {
-  id?: number;
-  created_at?: string;
-  updated_at?: string;
-  refno?: number;
-  revision: number;
-  original: string;
-  content: string;
-  status: SpeechScriptStatus;
-}
+export type ISpeechScript = Database["public"]["Tables"]["speech_scripts"]["Row"];

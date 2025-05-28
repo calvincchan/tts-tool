@@ -1,4 +1,4 @@
-import { SpeechScriptShow } from "@components/speech-scripts";
+import { SpeechScriptShow } from "@/components/speech-scripts";
 
 export default function SpeechScriptShowPage() {
   return <SpeechScriptShow />;

@@ -11,7 +11,8 @@
     "start": "refine start",
     "lint": "next lint",
     "refine": "refine",
-    "deploy": "vercel deploy --prod"
+    "deploy": "vercel deploy --prod",
+    "gen-types": "supabase gen types typescript --project-id rjzzkzbjbkwxkzgvyine > src/types/database.types.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",

@@ -1,9 +1,9 @@
 "use client";
 
+import { DAYJS_FORMAT } from "@/utils/constants";
 import { Stack, Typography } from "@mui/material";
 import { useShow } from "@refinedev/core";
 import { MarkdownField, Show } from "@refinedev/mui";
-import { DAYJS_FORMAT } from "@utils/constants";
 import dayjs from "dayjs";
 
 export const SpeechScriptShow = () => {

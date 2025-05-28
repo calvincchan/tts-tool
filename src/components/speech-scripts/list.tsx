@@ -1,9 +1,9 @@
 "use client";
 
-import { ISpeechScript } from "@interfaces/type";
+import { ISpeechScript } from "@/types/type";
+import { DAYJS_FORMAT } from "@/utils/constants";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DateField, EditButton, List, useDataGrid } from "@refinedev/mui";
-import { DAYJS_FORMAT } from "@utils/constants";
 import React from "react";
 
 export const SpeechScriptList = () => {

@@ -1,12 +1,13 @@
 "use client";
 
-import { ISpeechScript, SpeechScriptStatus } from "@interfaces/type";
+import { ISpeechScript, SpeechScriptStatus } from "@/types/type";
+import { DAYJS_FORMAT } from "@/utils/constants";
 import {
   Check,
   ContentCopy,
   Download,
   Pause,
-  PlayArrow,
+  PlayArrow
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
@@ -22,7 +23,6 @@ import {
 import { HttpError } from "@refinedev/core";
 import { Edit } from "@refinedev/mui";
 import { useForm } from "@refinedev/react-hook-form";
-import { DAYJS_FORMAT } from "@utils/constants";
 import WavesurferPlayer from "@wavesurfer/react";
 import dayjs from "dayjs";
 import Markdown from "markdown-to-jsx";
@@ -49,12 +49,12 @@ export const SpeechScriptEdit = () => {
     watch,
   } = useForm<ISpeechScript, HttpError, ISpeechScript>({
     defaultValues: {
-      content: "",
+      markup: "",
       status: "Draft",
     },
     refineCoreProps: {
       onMutationSuccess: () => {
-        resetField("content");
+        resetField("markup");
       },
     },
   });
@@ -65,7 +65,7 @@ export const SpeechScriptEdit = () => {
     if (!register) return;
     register("refno");
     register("revision");
-    register("content");
+    register("markup");
     register("updated_at");
     register("status");
   }, [register]);
@@ -82,7 +82,7 @@ export const SpeechScriptEdit = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ssml: getValues("content") }),
+        body: JSON.stringify({ text: getValues("markup") }),
       });
       if (!response.ok) {
         alert(
@@ -149,31 +149,32 @@ export const SpeechScriptEdit = () => {
 
         <Box>
           <Box mb={1} display="flex" gap={1} alignItems="center">
-            {["weak", "strong", "x-strong", "1s"].map((tag) => (
+            {["pause short", "pause", "pause long"].map((tag) => (
               <Button
                 key={tag}
                 variant="outlined"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `<break ${tag === "1s" ? "time" : "strength"}="${tag}"/>`
+                    `[${tag}]`
                   );
                 }}
                 startIcon={<ContentCopy />}
               >
-                {tag} Break
+                [{tag}]
               </Button>
             ))}
             <Typography variant="body2">
               <a
-                href="https://github.com/fabiancelik/rich-voice-editor/wiki/SSML-Tags-and-Functions"
-                target="ssml"
+                href="https://cloud.google.com/text-to-speech/docs/chirp3-hd#pause_control"
+                target="doc"
               >
-                SSML Reference
+                Pause Control
               </a>
             </Typography>
           </Box>
+
           <Controller
-            name="content"
+            name="markup"
             control={control}
             render={({ field: { value, onChange, name } }) => (
               <Editor
@@ -190,15 +191,15 @@ export const SpeechScriptEdit = () => {
                   borderRadius: 5,
                   border: "1px solid gray",
                 }}
-                placeholder="Type some SSML here..."
+                placeholder="Type some content here..."
               />
             )}
           />
-          {dirtyFields.content && (
+          {dirtyFields.markup && (
             <Chip label="unsaved" color="error" size="small" sx={{ my: 1 }} />
           )}
           <Typography variant="body2" color="error">
-            {errors.content?.message as string}
+            {errors.markup?.message as string}
           </Typography>
         </Box>
         <Box display="flex" gap={1}>
@@ -212,7 +213,7 @@ export const SpeechScriptEdit = () => {
           </LoadingButton>
           <Button
             {...saveButtonProps}
-            variant={dirtyFields.content ? "contained" : "outlined"}
+            variant={dirtyFields.markup ? "contained" : "outlined"}
           >
             Save
           </Button>

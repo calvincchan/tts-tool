@@ -1,4 +1,8 @@
-import { DevtoolsProvider } from "@providers/devtools";
+import { ColorModeContextProvider } from "@/contexts/color-mode";
+import { authProviderClient } from "@/providers/auth-provider";
+import { dataProvider } from "@/providers/data-provider";
+import { DevtoolsProvider } from "@/providers/devtools";
+import { Chat } from "@mui/icons-material";
 import { Refine } from "@refinedev/core";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { notificationProvider, RefineSnackbarProvider } from "@refinedev/mui";
@@ -6,11 +10,6 @@ import routerProvider from "@refinedev/nextjs-router";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
 import React, { Suspense } from "react";
-
-import { ColorModeContextProvider } from "@contexts/color-mode";
-import { Chat } from "@mui/icons-material";
-import { authProviderClient } from "@providers/auth-provider";
-import { dataProvider } from "@providers/data-provider";
 
 export const metadata: Metadata = {
   title: "Refine",

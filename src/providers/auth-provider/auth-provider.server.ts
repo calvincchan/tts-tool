@@ -1,5 +1,5 @@
+import { createSupabaseServerClient } from "@/utils/supabase/server";
 import type { AuthProvider } from "@refinedev/core";
-import { createSupabaseServerClient } from "@utils/supabase/server";
 
 export const authProviderServer: Pick<AuthProvider, "check"> = {
   check: async () => {

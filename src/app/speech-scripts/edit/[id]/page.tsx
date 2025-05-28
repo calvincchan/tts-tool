@@ -1,4 +1,4 @@
-import { SpeechScriptEdit } from "@components/speech-scripts";
+import { SpeechScriptEdit } from "@/components/speech-scripts";
 
 export default function SpeechScriptEditPage() {
   return <SpeechScriptEdit />;
