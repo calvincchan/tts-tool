@@ -3,8 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 import { createHash } from "crypto";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+const TTS_MODEL = "ja-JP-Chirp3-HD-Enceladus";
+
 function generateHash(text: string): string {
-  return createHash("sha256").update(text).digest("hex");
+  return createHash("sha256").update(TTS_MODEL + text).digest("hex");
 }
 
 interface RequestParams {
@@ -60,7 +62,7 @@ export default async function handler(
           input: { text: ssml },
           voice: {
             languageCode: "ja-JP",
-            name: "ja-JP-Chirp3-HD-Enceladus",
+            name: TTS_MODEL,
           },
           audioConfig: { speakingRate: 0.95, audioEncoding: "MP3" },
         });
