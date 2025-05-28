@@ -26,14 +26,10 @@ import { useForm } from "@refinedev/react-hook-form";
 import WavesurferPlayer from "@wavesurfer/react";
 import dayjs from "dayjs";
 import Markdown from "markdown-to-jsx";
-import Prism from "prismjs";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-javascript";
-import "prismjs/themes/prism.css"; //Example style, you can use another
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller } from "react-hook-form";
-import Editor from "react-simple-code-editor";
 import WaveSurfer from "wavesurfer.js";
+import { SSMLHighlighter } from "../ssml-highlighter";
 
 export const SpeechScriptEdit = () => {
   const [saved, setSaved] = useState(false);
@@ -60,15 +56,6 @@ export const SpeechScriptEdit = () => {
   });
 
   const record = query?.data?.data;
-
-  useEffect(() => {
-    if (!register) return;
-    register("refno");
-    register("revision");
-    register("markup");
-    register("updated_at");
-    register("status");
-  }, [register]);
 
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -177,20 +164,18 @@ export const SpeechScriptEdit = () => {
             name="markup"
             control={control}
             render={({ field: { value, onChange, name } }) => (
-              <Editor
+              <TextField
                 name={name}
+                id="outlined-multiline-static"
+                label="Content"
+                multiline
+                rows={24}
                 value={value}
-                onValueChange={(value) => {
-                  onChange(value);
+                onChange={(e) => {
+                  onChange(e.target.value);
                 }}
-                highlight={(code) =>
-                  Prism.highlight(code, Prism.languages.ssml, "ssml")
-                }
-                padding={10}
-                style={{
-                  borderRadius: 5,
-                  border: "1px solid gray",
-                }}
+                fullWidth
+                variant="outlined"
                 placeholder="Type some content here..."
               />
             )}
@@ -259,6 +244,16 @@ export const SpeechScriptEdit = () => {
           <Markdown style={{ color: "text.secondary" }}>
             {record?.original || "--"}
           </Markdown>
+        </Paper>
+        <Paper sx={{ p: 2 }} variant="outlined">
+          <Typography variant="body2">Previous SSML</Typography>
+          {record?.ssml ? (
+            <SSMLHighlighter ssml={record.ssml} />
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No SSML available
+            </Typography>
+          )}
         </Paper>
         <Box>
           <Typography variant="body2">
