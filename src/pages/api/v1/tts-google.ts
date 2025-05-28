@@ -57,12 +57,12 @@ export default async function handler(
       } else {
         // If the file does not exist, generate the TTS
         const [response] = await client.synthesizeSpeech({
-          input: { ssml },
+          input: { text: ssml },
           voice: {
             languageCode: "ja-JP",
-            name: "ja-JP-Chirp3-HD-Schedar",
+            name: "ja-JP-Chirp3-HD-Enceladus",
           },
-          audioConfig: { audioEncoding: "MP3", pitch: -1 },
+          audioConfig: { speakingRate: 0.95, audioEncoding: "MP3" },
         });
         if (!response.audioContent) {
           return res.status(500).json({
