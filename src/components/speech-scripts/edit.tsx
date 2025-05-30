@@ -64,6 +64,8 @@ export const SpeechScriptEdit = () => {
     try {
       setLoading(true);
       setAudioUrl(null);
+
+      // Use the Google TTS API to generate speech
       const response = await fetch("/api/v1/tts-google", {
         method: "POST",
         headers: {
@@ -72,18 +74,18 @@ export const SpeechScriptEdit = () => {
         body: JSON.stringify({ text: getValues("markup") }),
       });
       if (!response.ok) {
-        alert(
-          "1 Failed to generate speech, error message: " + response.statusText
-        );
+        const json = await response.json();
+        throw new Error(json.error || "Failed to generate speech");
       }
+
+      // Prepare the audio URL from the response
       const data = await response.json();
       if (data.url) {
         // delay 2 seconds
         setAudioUrl(data.url);
       }
     } catch (error) {
-      alert("2 Failed to generate speech, error message: " + error);
-      console.error("Error generating speech:", error);
+      alert("Failed to generate speech, " + error);
     } finally {
       setLoading(false);
     }

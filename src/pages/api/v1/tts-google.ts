@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { createHash } from "crypto";
 import { GoogleAuth } from 'google-auth-library';
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -16,40 +16,40 @@ function generateHash(text: string): string {
  * https://cloud.google.com/text-to-speech/docs/chirp3-hd#pause_control
  */
 async function synthesize(text: string) {
+  // Create a new GoogleAuth instance which reads GOOGLE_APPLICATION_CREDENTIALS env var
+  const auth = new GoogleAuth({
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    credentials: {
+      client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(
+        /\\n/g,
+        "\n",
+      ),
+    },
+  });
+
+  // Get the access token
+  const client = await auth.getClient();
+  const accessToken = await client.getAccessToken();
+
+  // Get the project ID
+  const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
+
+  // Prepare the request payload
+  const payload = {
+    input: {
+      markup: text
+    },
+    voice: {
+      languageCode: "ja-JP",
+      name: process.env.VOICE_NAME || TTS_MODEL,
+    },
+    audioConfig: {
+      audioEncoding: "LINEAR16"
+    }
+  };
+
   try {
-    // Create a new GoogleAuth instance which reads GOOGLE_APPLICATION_CREDENTIALS env var
-    const auth = new GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
-      credentials: {
-        client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.replace(
-          /\\n/g,
-          "\n",
-        ),
-      },
-    });
-
-    // Get the access token
-    const client = await auth.getClient();
-    const accessToken = await client.getAccessToken();
-
-    // Get the project ID
-    const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
-
-    // Prepare the request payload
-    const payload = {
-      input: {
-        markup: text
-      },
-      voice: {
-        languageCode: "ja-JP",
-        name: process.env.VOICE_NAME || TTS_MODEL,
-      },
-      audioConfig: {
-        audioEncoding: "LINEAR16"
-      }
-    };
-
     // Make the API call
     const response = await axios({
       method: 'post',
@@ -68,7 +68,18 @@ async function synthesize(text: string) {
     // Write the binary audio content to a file
     return { data: audioContent, error: null };
   } catch (error) {
-    console.error("Error synthesizing speech:", error);
+    if (axios.isAxiosError(error)) {
+      // Handle Axios error
+      const axiosError = error as AxiosError;
+      const errorMessage = axiosError.response?.data as { error: { message: string; }; };
+      console.log("Error details:", typeof errorMessage.error.message);
+      return {
+        data: null,
+        error: new Error(errorMessage.error.message || 'Axios error occurred'),
+      };
+    }
+    // Handle other errors (e.g., network issues, etc.)
+    console.error('Error during TTS synthesis:', error);
     return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
   }
 }
@@ -115,7 +126,7 @@ export default async function handler(
         const { data: audioContent, error: generateError } = await synthesize(text);
         if (generateError) {
           return res.status(500).json({
-            error: String(generateError),
+            error: generateError.message || "Failed to generate TTS",
           });
         }
 
