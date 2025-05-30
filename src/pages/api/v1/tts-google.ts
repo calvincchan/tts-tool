@@ -5,7 +5,7 @@ import { GoogleAuth } from 'google-auth-library';
 import type { NextApiRequest, NextApiResponse } from "next";
 
 /* default TTS model */
-const TTS_MODEL = "ja-JP-Chirp3-HD-Enceladus";
+const TTS_MODEL = "ja-JP-Wavenet-D";
 
 function generateHash(text: string): string {
   return createHash("sha256").update(TTS_MODEL + text).digest("hex");
@@ -38,14 +38,15 @@ async function synthesize(text: string) {
   // Prepare the request payload
   const payload = {
     input: {
-      markup: text
+      ssml: text
     },
     voice: {
       languageCode: "ja-JP",
       name: process.env.VOICE_NAME || TTS_MODEL,
     },
     audioConfig: {
-      audioEncoding: "LINEAR16"
+      audioEncoding: "LINEAR16",
+      pitch: -1
     }
   };
 

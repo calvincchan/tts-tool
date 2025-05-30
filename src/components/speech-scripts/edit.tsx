@@ -26,8 +26,13 @@ import { useForm } from "@refinedev/react-hook-form";
 import WavesurferPlayer from "@wavesurfer/react";
 import dayjs from "dayjs";
 import Markdown from "markdown-to-jsx";
+import Prism from "prismjs";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "prismjs/themes/prism.css"; //Example style, you can use another
 import { useState } from "react";
 import { Controller } from "react-hook-form";
+import Editor from "react-simple-code-editor";
 import WaveSurfer from "wavesurfer.js";
 import { SSMLHighlighter } from "../ssml-highlighter";
 
@@ -45,12 +50,12 @@ export const SpeechScriptEdit = () => {
     watch,
   } = useForm<ISpeechScript, HttpError, ISpeechScript>({
     defaultValues: {
-      markup: "",
+      ssml: "",
       status: "Draft",
     },
     refineCoreProps: {
       onMutationSuccess: () => {
-        resetField("markup");
+        resetField("ssml");
       },
     },
   });
@@ -71,7 +76,7 @@ export const SpeechScriptEdit = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: getValues("markup") }),
+        body: JSON.stringify({ text: getValues("ssml") }),
       });
       if (!response.ok) {
         const json = await response.json();
@@ -138,55 +143,58 @@ export const SpeechScriptEdit = () => {
 
         <Box>
           <Box mb={1} display="flex" gap={1} alignItems="center">
-            {["pause short", "pause", "pause long"].map((tag) => (
+            {["weak", "strong", "x-strong", "1s"].map((tag) => (
               <Button
                 key={tag}
                 variant="outlined"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `[${tag}]`
+                    `<break ${tag === "1s" ? "time" : "strength"}="${tag}"/>`
                   );
                 }}
                 startIcon={<ContentCopy />}
               >
-                [{tag}]
+                {tag} Break
               </Button>
             ))}
             <Typography variant="body2">
               <a
-                href="https://cloud.google.com/text-to-speech/docs/chirp3-hd#pause_control"
-                target="doc"
+                href="https://github.com/fabiancelik/rich-voice-editor/wiki/SSML-Tags-and-Functions"
+                target="ssml"
               >
-                Pause Control
+                SSML Reference
               </a>
             </Typography>
           </Box>
 
           <Controller
-            name="markup"
+            name="ssml"
             control={control}
             render={({ field: { value, onChange, name } }) => (
-              <TextField
+              <Editor
                 name={name}
-                id="outlined-multiline-static"
-                label="Content"
-                multiline
-                rows={24}
                 value={value}
-                onChange={(e) => {
-                  onChange(e.target.value);
+                onValueChange={(value) => {
+                  onChange(value);
                 }}
-                fullWidth
-                variant="outlined"
+                highlight={(code) =>
+                  Prism.highlight(code, Prism.languages.ssml, "ssml")
+                }
+                padding={10}
+                style={{
+                  borderRadius: 5,
+                  border: "1px solid gray",
+                  fontFamily: '"Fira code", "Fira Mono", monospace',
+                }}
                 placeholder="Type some content here..."
               />
             )}
           />
-          {dirtyFields.markup && (
+          {dirtyFields.ssml && (
             <Chip label="unsaved" color="error" size="small" sx={{ my: 1 }} />
           )}
           <Typography variant="body2" color="error">
-            {errors.markup?.message as string}
+            {errors.ssml?.message as string}
           </Typography>
         </Box>
         <Box display="flex" gap={1}>
@@ -200,7 +208,7 @@ export const SpeechScriptEdit = () => {
           </LoadingButton>
           <Button
             {...saveButtonProps}
-            variant={dirtyFields.markup ? "contained" : "outlined"}
+            variant={dirtyFields.ssml ? "contained" : "outlined"}
           >
             Save
           </Button>

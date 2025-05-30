@@ -46,7 +46,7 @@ export const SpeechScriptList = () => {
         width: 160
       },
       {
-        field: "markup",
+        field: "ssml",
         headerName: "Content",
         minWidth: 400,
         flex: 1,
