@@ -3,8 +3,17 @@
 import { ISpeechScript } from "@/types/type";
 import { DAYJS_FORMAT } from "@/utils/constants";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { DateField, EditButton, List, useDataGrid } from "@refinedev/mui";
+import { EditButton, List, useDataGrid } from "@refinedev/mui";
+import dayjs from "dayjs";
 import React from "react";
+
+function icon(name: string) {
+  return (
+    name === "Completed" ? "✅" :
+      name === "In Progress" ? "🔄" :
+        name === "Draft" ? "✏️" : ""
+  );
+}
 
 export const SpeechScriptList = () => {
   const { dataGridProps } = useDataGrid<ISpeechScript>({
@@ -15,6 +24,9 @@ export const SpeechScriptList = () => {
           order: "asc",
         },
       ],
+    },
+    pagination: {
+      pageSize: 100,
     },
   });
 
@@ -28,23 +40,23 @@ export const SpeechScriptList = () => {
       {
         field: "status",
         headerName: "Status",
+        renderCell: ({ value }) => {
+          return <>{icon(value)} {value}</>;
+        },
+        width: 160
       },
       {
-        field: "revision",
-        headerName: "Revision",
-        type: "number",
-      },
-      {
-        field: "original",
-        headerName: "Original",
+        field: "markup",
+        headerName: "Content",
         minWidth: 400,
+        flex: 1,
       },
       {
         field: "updated_at",
         headerName: "Updated At",
         minWidth: 200,
         renderCell: function render({ value }) {
-          return <DateField value={value} format={DAYJS_FORMAT} />;
+          return dayjs(value).format(DAYJS_FORMAT);
         },
       },
       {
@@ -68,7 +80,7 @@ export const SpeechScriptList = () => {
 
   return (
     <List>
-      <DataGrid {...dataGridProps} columns={columns} autoHeight />
+      <DataGrid {...dataGridProps} columns={columns} pageSizeOptions={[10, 25, 100]} />
     </List>
   );
 };
