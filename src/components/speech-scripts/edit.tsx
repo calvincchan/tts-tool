@@ -38,6 +38,7 @@ import { SSMLHighlighter } from "../ssml-highlighter";
 
 export const SpeechScriptEdit = () => {
   const [saved, setSaved] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
 
   const {
     saveButtonProps,
@@ -70,13 +71,15 @@ export const SpeechScriptEdit = () => {
       setLoading(true);
       setAudioUrl(null);
 
+      const text = getValues("ssml");
+
       // Use the Google TTS API to generate speech
       const response = await fetch("/api/v1/tts-google", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: getValues("ssml") }),
+        body: JSON.stringify({ text }),
       });
       if (!response.ok) {
         const json = await response.json();
@@ -166,7 +169,6 @@ export const SpeechScriptEdit = () => {
               </a>
             </Typography>
           </Box>
-
           <Controller
             name="ssml"
             control={control}
@@ -187,6 +189,20 @@ export const SpeechScriptEdit = () => {
                   fontFamily: '"Fira code", "Fira Mono", monospace',
                 }}
                 placeholder="Type some content here..."
+                onSelect={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  const selectedText = target.value.substring(
+                    target.selectionStart,
+                    target.selectionEnd
+                  );
+                  if (selectedText) {
+                    setSelectedText(selectedText);
+                  }
+                }}
+                onClick={(e) => {
+                  console.log(e);
+                  console.log(selectedText);
+                }}
               />
             )}
           />
@@ -197,6 +213,7 @@ export const SpeechScriptEdit = () => {
             {errors.ssml?.message as string}
           </Typography>
         </Box>
+        {JSON.stringify(selectedText)}
         <Box display="flex" gap={1}>
           <LoadingButton
             variant="contained"
