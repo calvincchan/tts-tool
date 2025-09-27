@@ -23,6 +23,10 @@ export const SpeechScriptList = () => {
           field: "refno",
           order: "asc",
         },
+        {
+          field: "id",
+          order: "asc",
+        }
       ],
     },
     pagination: {
@@ -33,8 +37,13 @@ export const SpeechScriptList = () => {
   const columns = React.useMemo<GridColDef[]>(
     () => [
       {
+        field: "id",
+        headerName: "ID",
+        type: "number",
+      },
+      {
         field: "refno",
-        headerName: "Page ID",
+        headerName: "Page No.",
         type: "number",
       },
       {
